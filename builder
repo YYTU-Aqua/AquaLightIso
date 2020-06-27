@@ -1,17 +1,22 @@
 #!/bin/sh
-zenity --question --width 350 --text "これはまだ開発段階ですそれでも続けますか？" --ok-label "OK" cancel-label "No"
+cd `dirname $0`
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+zenity --question --width 350 --text "これはまだ開発段階ですそれでも続けますか？" --ok-label "OK" cancel-label $SCRIPT_DIR
+echo $SCRIPT_DIR
+cd $SCRIPT_DIR
 case $? in
-0) main=$(zenity --width 700 --height 320 --list --title "操作を選んでね" --text="操作を選んでね" --column "" setup 背景の設定 Calamaresの設定 パッケージの設定 GRUBの背景 GRUB表示名 LightDM LiveCDusername build)
+0) cd $SCRIPT_DIR
+main=$(zenity --width 700 --height 320 --list --title "操作を選んでね" --text="操作を選んでね" --column "" setup 背景の設定 Calamaresの設定 パッケージの設定 GRUBの背景 GRUB表示名 LightDM LiveCDusername build)
 ;;
 1) exit
 ;;
 esac
 case $main in
-setup) cd channels
-git clone https://github.com/YYTU-Aqua/AquaLightOS.git
-cd ../
-cp -f -r channels/AquaLightOS/aqua.add channels
-sudo sh builder
+setup) cd `dirname $0`
+git clone https://github.com/YYTU-Aqua/AquaLightOS.git $SCRIPT_DIR
+cp -f -r $SCRIPT_DIR/AquaLightOS/aqua.add channels
+cd $SCRIPT_DIR
+sudo builder
 ;;
 背景の設定) file=$(zenity --file-selection --title "ファイルを選んで下さい")
 echo $file
@@ -44,6 +49,9 @@ name=$(<user)
 sudo sh builder
 ;;
 build)use=$(zenity --width 350 --forms --add-entry "あなたのusernameは？")
+cd $SCRIPT_DIR
+zenity --width 350 --info --title "info" --text "時間がかかるのでお茶でも飲んでお待ち下さい"
+zenity --width 350 --info --title "info" --text "途中でEnterを押してくださいとの表記が出るのでEnterを押してください"
 sudo cp -f -r /etc/lightdm channels/aqua.add/airootfs.any/etc/
 sudo sed -i 's/alter*/#/g' channels/aqua.add/packages.x86_64/packages.x86_64
 sudo sed -i 's/calamares/#/g' channels/aqua.add/packages.x86_64/packages.x86_64
@@ -58,7 +66,7 @@ sudo rm -f -r channels/aqua.add/airootfs.any/usr/share/themes/
 sudo cp -r -f /usr/share/themes channels/aqua.add/airootfs.any/usr/share/
 sudo rm -f -r channels/aqua.add/airootfs.any/usr/share/icons/
 sudo cp -r -f /usr/share/icons channels/aqua.add/airootfs.any/usr/share/
-sudo ./build.sh -b -u $name -j aqua
+sudo sh $SCRIPT_DIR/build.sh -b -u $name -j aqua
 ;;
 *) exit
 ;;
