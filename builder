@@ -1,12 +1,18 @@
 #!/bin/sh
 zenity --question --width 350 --text "これはまだ開発段階ですそれでも続けますか？" --ok-label "OK" cancel-label "No"
 case $? in
-0) main=$(zenity --width 700 --height 320 --list --title "操作を選んでね" --text="操作を選んでね" --column "" 背景の設定 Calamaresの設定 パッケージの設定 GRUBの背景 GRUB表示名 LightDM LiveCDusername build)
+0) main=$(zenity --width 700 --height 320 --list --title "操作を選んでね" --text="操作を選んでね" --column "" setup 背景の設定 Calamaresの設定 パッケージの設定 GRUBの背景 GRUB表示名 LightDM LiveCDusername build)
 ;;
 1) exit
 ;;
 esac
 case $main in
+setup) cd channels
+git clone https://github.com/YYTU-Aqua/AquaLightOS.git
+cd ../
+cp -f -r channels/AquaLightOS/aqua.add channels
+sudo sh builder
+;;
 背景の設定) file=$(zenity --file-selection --title "ファイルを選んで下さい")
 echo $file
 sudo rm channels/aqua.add/airootfs.any/usr/share/backgrounds/Aqua.jpg
